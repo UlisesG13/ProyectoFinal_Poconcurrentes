@@ -1,4 +1,3 @@
-// Mock in-memory data store that follows the DB design requirements.
 const db = {
   programs: [],
   quarters: [],
@@ -16,7 +15,6 @@ function generateData() {
     db.quarters.push({ id: `q${q}`, programId: program.id, number: q })
   }
 
-  // 70 asignaturas = 7 por cuatrimestre
   let sid = 1
   for (let q = 1; q <= program.quarters; q++) {
     for (let i = 0; i < 7; i++) {
@@ -25,13 +23,11 @@ function generateData() {
     }
   }
 
-  // 35 docentes, asignados a cuatrimestres impares (1,3,5,7,9)
   const odd = [1, 3, 5, 7, 9]
   for (let t = 1; t <= 35; t++) {
     db.teachers.push({ id: `t${t}`, name: `Docente ${t}`, quarters: [odd[(t - 1) % odd.length]] })
   }
 
-  // 35 grupos, 25 alumnos por grupo -> 875 alumnos
   let gid = 1
   let studentId = 1
   for (let g = 0; g < 35; g++) {
@@ -65,7 +61,6 @@ export async function createProgram(payload) {
   const id = `p${db.programs.length + 1}`
   const program = { id, ...payload }
   db.programs.push(program)
-  // generate quarters for new program
   for (let q = 1; q <= program.quarters; q++) db.quarters.push({ id: `${id}-q${q}`, programId: id, number: q })
   return program
 }
@@ -92,7 +87,6 @@ export async function getTeachers() {
 
 export async function checkCourseExists(subjectId) {
   await wait()
-  // Simulate: 50% exist
   return Math.random() > 0.5
 }
 
@@ -103,7 +97,6 @@ export async function checkUserExists(userId) {
 
 export async function createCourse(subject) {
   await wait()
-  // mock: return success
   return { success: true, subject }
 }
 
