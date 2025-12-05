@@ -14,3 +14,33 @@ The React Compiler is currently not compatible with SWC. See [this issue](https:
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+---
+
+**Proyecto: Frontend para interacción con Moodle (mock)**
+
+Instrucciones rápidas para correr el frontend localmente:
+
+- Instalar dependencias:
+
+```powershell
+npm install
+```
+
+- Instalar `react-router-dom` (si `npm install` no lo agregó automáticamente):
+
+```powershell
+npm install react-router-dom
+```
+
+- Iniciar servidor de desarrollo:
+
+```powershell
+npm run dev
+```
+
+Estructura inicial creada en `src/` sigue la arquitectura atómica: `components/atoms`, `components/molecules`, `components/organisms`, `layouts`, `pages`, `services`.
+
+El archivo `data/db-schema.md` contiene el diseño propuesto de la base de datos y la población de ejemplo. `src/services/mockApi.js` contiene un mock que genera los datos solicitados (1 programa, 10 cuatrimestres, 70 asignaturas, 35 docentes, 35 grupos y 875 alumnos) para pruebas del frontend.
+
+Siguiente paso propuesto: conectar este frontend con una API real (por ejemplo una pequeña API Express o la API REST de Moodle) y reemplazar `mockApi` por llamadas reales.
