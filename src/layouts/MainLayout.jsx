@@ -12,6 +12,7 @@ export default function MainLayout({ children }) {
           <Link to="/teachers">Docentes</Link>
           <Link to="/students">Estudiantes</Link>
           <Link to="/groups">Grupos</Link>
+          <Link to="/cuatrimestres">Cuatrimestres</Link>
           <Link to="/admin">Admin</Link>
         </nav>
       </header>

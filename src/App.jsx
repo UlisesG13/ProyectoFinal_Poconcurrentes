@@ -6,6 +6,7 @@ import PlatformConnection from './pages/PlatformConnection'
 import TeacherManagement from './pages/TeacherManagement'
 import StudentManagement from './pages/StudentManagement'
 import GroupManagement from './pages/GroupManagement'
+import CuatrimestreManagement from './pages/CuatrimestreManagement'
 import Dashboard from './pages/Dashboard'
 import './styles/global.css'
 
@@ -20,6 +21,7 @@ function App() {
           <Route path="/teachers" element={<TeacherManagement />} />
           <Route path="/students" element={<StudentManagement />} />
           <Route path="/groups" element={<GroupManagement />} />
+          <Route path="/cuatrimestres" element={<CuatrimestreManagement />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>
       </MainLayout>

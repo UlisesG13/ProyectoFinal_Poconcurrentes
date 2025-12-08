@@ -1,27 +1,81 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Button from '../atoms/Button'
 import Input from '../atoms/Input'
 
-export default function StudentForm({ onCreate }) {
-  const [name, setName] = useState('')
+export default function StudentForm({ onCreate, initialData }) {
+  const [nombre, setNombre] = useState('')
   const [matricula, setMatricula] = useState('')
-  const [quarter, setQuarter] = useState('1')
+  const [cuatrimestre, setCuatrimestre] = useState('1')
+  const [correo, setCorreo] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  function submit(e) {
+  useEffect(() => {
+    if (initialData) {
+      setNombre(initialData.nombre || '')
+      setMatricula(initialData.matricula || '')
+      setCuatrimestre(initialData.cuatrimestre || '1')
+      setCorreo(initialData.correo || '')
+    }
+  }, [initialData])
+
+  async function submit(e) {
     e.preventDefault()
-    if (!name || !matricula) return
-    onCreate({ name, matricula, quarter: Number(quarter) })
-    setName('')
-    setMatricula('')
+    if (!nombre.trim() || !matricula.trim() || !correo.trim()) {
+      setError('Todos los campos son requeridos')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+
+    try {
+      await onCreate({
+        nombre: nombre.trim(),
+        matricula: matricula.trim(),
+        cuatrimestre: Number(cuatrimestre),
+        correo: correo.trim()
+      })
+      setNombre('')
+      setMatricula('')
+      setCuatrimestre('1')
+      setCorreo('')
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <form className="program-form" onSubmit={submit}>
-      <Input label="Nombre del Estudiante" name="student" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ej: Juan Pérez" />
-      <Input label="Matrícula" name="matricula" value={matricula} onChange={(e) => setMatricula(e.target.value)} placeholder="Ej: M2024001" />
+    <form className="student-form" onSubmit={submit}>
+      {error && <div style={{ color: 'red', marginBottom: '0.5rem' }}>{error}</div>}
+
+      <Input
+        label="Nombre del Alumno"
+        name="nombre"
+        value={nombre}
+        onChange={(e) => setNombre(e.target.value)}
+        placeholder="Ej: Juan Pérez"
+      />
+      <Input
+        label="Matrícula"
+        name="matricula"
+        value={matricula}
+        onChange={(e) => setMatricula(e.target.value)}
+        placeholder="Ej: M2024001"
+      />
+      <Input
+        label="Email"
+        name="correo"
+        type="email"
+        value={correo}
+        onChange={(e) => setCorreo(e.target.value)}
+        placeholder="Ej: juan@example.com"
+      />
       <label className="input-group">
         <span className="input-label">Cuatrimestre</span>
-        <select value={quarter} onChange={(e) => setQuarter(e.target.value)}>
+        <select value={cuatrimestre} onChange={(e) => setCuatrimestre(e.target.value)}>
           {Array.from({ length: 10 }, (_, i) => i + 1).map((q) => (
             <option key={q} value={q}>
               {q}
@@ -29,7 +83,9 @@ export default function StudentForm({ onCreate }) {
           ))}
         </select>
       </label>
-      <Button type="submit">Crear Estudiante</Button>
+      <Button type="submit" disabled={loading}>
+        {loading ? 'Guardando...' : initialData ? 'Actualizar Alumno' : 'Crear Alumno'}
+      </Button>
     </form>
   )
 }

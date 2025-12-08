@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import ProgramForm from '../molecules/ProgramForm'
 import QuarterSelect from '../molecules/QuarterSelect'
 import SubjectsList from '../molecules/SubjectsList'
-import * as api from '../../services/mockApi'
+import * as progApi from '../../services/programasService'
+import * as cuatApi from '../../services/cuatrimestreService'
 import Button from '../atoms/Button'
 
 export default function ProgramModule() {
@@ -12,64 +13,111 @@ export default function ProgramModule() {
   const [selectedQuarter, setSelectedQuarter] = useState('')
   const [subjects, setSubjects] = useState([])
   const [status, setStatus] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    api.getPrograms().then(setPrograms)
+    loadPrograms()
   }, [])
 
+  async function loadPrograms() {
+    try {
+      setLoading(true)
+      setError('')
+      const data = await progApi.getProgramas()
+      setPrograms(data)
+    } catch (err) {
+      setError(`Error cargando programas: ${err.message}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    if (!selectedProgram) return
-    api.getQuarters(selectedProgram.id).then(setQuarters)
+    if (!selectedProgram) {
+      setQuarters([])
+      return
+    }
+    loadQuartersByProgram(selectedProgram.id)
   }, [selectedProgram])
+
+  async function loadQuartersByProgram(programaId) {
+    try {
+      const data = await cuatApi.getCuatrimestresByPrograma(programaId)
+      setQuarters(data)
+    } catch (err) {
+      setError(`Error cargando cuatrimestres: ${err.message}`)
+      setQuarters([])
+    }
+  }
 
   useEffect(() => {
     if (!selectedQuarter) return
-    api.getSubjectsForQuarter(selectedProgram?.id, selectedQuarter).then(setSubjects)
-  }, [selectedQuarter, selectedProgram])
+    // Aquí luego pondrás tu servicio real de asignaturas
+    // getSubjectsForQuarter(selectedQuarter)
+  }, [selectedQuarter])
 
-  function handleCreateProgram(p) {
-    api.createProgram(p).then((newP) => {
-      setPrograms((s) => [...s, newP])
-      setStatus('Programa creado')
-    })
+  function handleCreateProgram(newP) {
+    setPrograms((prev) => [...prev, newP])
+    setStatus('Programa creado')
   }
 
   async function handleCheckCourse(subject) {
     setStatus('Verificando...')
-    const exists = await api.checkCourseExists(subject.id)
-    setStatus(exists ? 'Curso existe en la plataforma' : 'Curso no existe')
+    // Aquí luego integrarás el check real
+    setStatus('Sin implementación aún')
   }
 
   return (
     <section className="program-module">
       <h2>Gestión de Programas y Cursos</h2>
+
+      {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
+      {loading && <div>Cargando programas...</div>}
+
       <div className="two-col">
         <div>
           <ProgramForm onCreate={handleCreateProgram} />
+
           <label>
             Programa
-            <select onChange={(e) => setSelectedProgram(programs.find(p=>p.id===e.target.value))}>
+            <select
+              value={selectedProgram?.id || ''}
+              onChange={(e) => {
+                const selected = programs.find((p) => String(p.id) === e.target.value)
+                setSelectedProgram(selected || null)
+              }}
+            >
               <option value="">-- Seleccione --</option>
               {programs.map((p) => (
                 <option value={p.id} key={p.id}>
-                  {p.name}
+                  {p.nombre}
                 </option>
               ))}
             </select>
           </label>
-          <QuarterSelect quarters={quarters} value={selectedQuarter} onChange={setSelectedQuarter} />
+
+          <QuarterSelect
+            quarters={quarters}
+            value={selectedQuarter}
+            onChange={setSelectedQuarter}
+          />
         </div>
 
         <div>
           <h3>Materias</h3>
           <SubjectsList subjects={subjects} />
+
           {subjects.map((s) => (
             <div key={s.id} className="subject-actions">
-              <Button onClick={() => handleCheckCourse(s)}>Verificar si existe</Button>
+              <Button onClick={() => handleCheckCourse(s)}>
+                Verificar si existe
+              </Button>
             </div>
           ))}
         </div>
       </div>
+
       <div className="status">{status}</div>
     </section>
   )

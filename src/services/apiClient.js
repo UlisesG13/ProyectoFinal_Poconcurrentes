@@ -73,5 +73,5 @@ class APIClient {
   }
 }
 
-export const apiClient = new APIClient(process.env.REACT_APP_API_URL || 'http://localhost:8080/api');
+export const apiClient = new APIClient(import.meta.env.VITE_URL_API || 'http://localhost:8000/api');
 export default APIClient;
